@@ -49,13 +49,19 @@ void setup() {
   });
   server.on("/socket1On", [](){
     server.send(200, "text/html", webPage);
-    int i=9;
-      Serial.write(i);
+    digitalWrite(4, HIGH);
+    delay(10); //Turn On LED
+    
+    //int i=9;
+    //Serial.write(i); // Using UART
   });
   server.on("/socket1Off", [](){
     server.send(200, "text/html", webPage);
-    int a=0;
-      Serial.write(a);
+    digitalWrite(4, LOW);
+    delay(10); //Turn off LED
+    
+    //int a=0;
+    //Serial.write(a); //Using UART
   });
 
   server.begin();
