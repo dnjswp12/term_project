@@ -7,8 +7,8 @@ MDNSResponder mdns;
  
 ESP8266WebServer server(80);
 String webPage;
-const char* ssid     = "John";      //wifi name
-const char* password = "41126469";  //wifi password
+const char* ssid     = "*******";      //wifi name
+const char* password = "*******";  //wifi password
  
 void setup() {
  
