@@ -51,8 +51,6 @@ void setup() {
     server.send(200, "text/html", webPage);
     int i=9;
       Serial.write(i);
-      //Serial.printf("%d",i);
-      //Serial.print("OK");
   });
   server.on("/socket1Off", [](){
     server.send(200, "text/html", webPage);
