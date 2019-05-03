@@ -1,0 +1,67 @@
+#
+# Created by Rui Santos
+# Complete project details: http://randomnerdtutorials.com
+#
+
+import paho.mqtt.client as mqtt
+from flask import Flask, render_template, request #플라스크 및 html 템플릿을 사용하기 위한 import
+app = Flask(__name__)
+
+mqttc=mqtt.Client() # mqtt client 오브젝트 생성
+mqttc.connect("localhost",1883,60) # 로컬호스트(브로커 아이피), 1883포트로 연결
+mqttc.loop_start()
+
+# Create a dictionary called pins to store the pin number, name, and pin state:
+# 'pins'라는 딕셔너리 (자료형 묶음)을 생성, 핀 번호, 이름, 핀 상태를 선언
+# 딕셔너리에는 변하지 않는 키값, 변할 수 있는 값이 있다.
+# pins 라는 딕셔너리 안에 '4'딕셔너리, '5'딕셔너리를 생성, name, board, topic, state는 불변의 키값
+pins = {
+   4 : {'name' : 'GPIO 4', 'board' : 'esp8266', 'topic' : 'esp8266/4', 'state' : 'False'},
+   5 : {'name' : 'GPIO 5', 'board' : 'esp8266', 'topic' : 'esp8266/5', 'state' : 'False'}
+   }
+
+# Put the pin dictionary into the template data dictionary:
+# 'pins'딕셔너리를 template data 딕셔너리에 넣어준다
+templateData = {
+   'pins' : pins
+   }
+# '/'루트 경로를 말한다.
+@app.route("/")
+def main():
+   # Pass the template data into the template main.html and return it to the user
+   # main.html에서 templatedata를 참조하고 유저에게 리턴해준다.
+   return render_template('main.html', **templateData)
+
+# The function below is executed when someone requests a URL with the pin number and action in it:
+# 아래의 기능은 url(핀 넘버와, 어떤 기능과 함께)에 어떤 요청이 있을때 실행된다. 
+#/<~> : 플라스크에 변수값을 의미 한다. 루트 경로에 /변수값1/변수값2/변수값3 이렇게 되면 action 함수를 실행
+@app.route("/<board>/<changePin>/<action>")
+
+def action(board, changePin, action):
+   # Convert the pin from the URL into an integer:
+   # 'changePin'이라는 변수를 int형으로 변환
+   changePin = int(changePin)
+   # Get the device name for the pin being changed:
+   # changePin이 변환?되는 동안 device name을 가져온다. / 변경되는 핀의 디바이스 이름을 가져온다
+   # pins 딕셔너리 안에 4,5 딕셔너리가 있음 changePin은 이 pins안에 있는 딕셔너리를 말한다. 
+   devicePin = pins[changePin]['name']
+   # If the action part of the URL is "on," execute the code indented below:
+   # URL이 'on'이라는 액션일때 아래의 코드르 실행 한다. 
+   if action == "1" and board == 'esp8266':
+      mqttc.publish(pins[changePin]['topic'],"1") 
+      pins[changePin]['state'] = 'True'
+   if action == "0" and board == 'esp8266':
+      mqttc.publish(pins[changePin]['topic'],"0")
+      pins[changePin]['state'] = 'False'
+      # action이 1(혹은 0)이고, 보드가 esp8266일때  토픽/메시지 발행을 하는데 pins 딕셔너리에 4,5(gpio번호를 말함)딕셔너리를 불러오고 "['~']" 4,5딕셔너리 
+        안에 있는 키의 value를 "['~'],~~" '~~'로 바꿔서 메세지를 발행하게 된다.
+   # Along with the pin dictionary, put the message into the template data dictionary:
+   # 핀 딕셔너리와 함께 메세지를 templatedata  딕셔너리에 넣는다.
+   templateData = {
+      'pins' : pins
+   }
+
+   return render_template('main.html', **templateData)
+
+if __name__ == "__main__":
+   app.run(host='0.0.0.0', debug=True)
