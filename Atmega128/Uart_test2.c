@@ -1,6 +1,6 @@
 
 
-ypedef unsigned char INT8;
+typedef unsigned char INT8;
 typedef unsigned int INT16;
 #define F_CPU 8000000
 #define BAUD 9600
