@@ -1,4 +1,4 @@
-*
+/*
  Header file for USART #0 
 */ 
 
