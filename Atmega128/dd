@@ -1,0 +1,128 @@
+/*
+ * motor.c
+ *
+ * Created: 2019-10-02 오후 4:47:39
+ *  Author: user
+ */ 
+
+typedef unsigned char INT8;
+typedef unsigned int INT16;
+
+#define F_CPU 8000000UL
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include "UART0.h"
+#include "UART1.h"
+
+char recieve = 0;
+INT8 m_flag = 0;
+
+ISR(TIMER0_COMP_vect)
+{
+	m_flag++;
+	
+}// 1/4 step >> 800번 돌았을때 1바퀴
+void port_init();
+void Motor_init();
+void led_bright();
+void motor();
+int main(void)
+{
+	port_init();
+	Motor_init();
+    while(1)
+    {
+	     motor();
+    }
+}
+
+void port_init()
+{
+	DDRD = 0xCF; // dir(PD7), EN(PD6)
+	DDRB |= 0x90; // OC1(PB4), OC2(PB7)
+	DDRC |= 0x01;
+	DDRG = 0xff;
+	USART0_init(MYUBRR);
+	USART1_init(MYUBRR1);
+	
+	
+	USART0_Transmit_String("BT-CONNECTED!");
+	USART0_Transmit_NewLine();
+	_delay_ms(100);
+}
+
+void Motor_init()
+{
+	PORTC |= 0x01; // MODE1 1/4step(PC0)
+	PORTD = 0xCF;
+	//timer0, CTC
+	TCCR0 |= (0<<FOC0)
+	|(0<<WGM00)|(1<<WGM01)
+	|(1<<COM00)|(0<<COM01)
+	|(0<<CS02)|(1<<CS01)|(1<<CS00);
+	//CTC, N=32, Toggle
+	OCR0 = 125;
+	TIMSK |= (1<<OCIE0);
+	sei(); // output compare match
+}
+void motor()
+{
+	PORTD = 0xCF;
+		recieve = USART1_Receive();
+		//USART0_Transmit(recieve);
+		//USART0_Transmit_NewLine();
+		
+		if (recieve == 'u')
+		{
+			USART0_Transmit('U');
+			m_flag = 0;
+			while(m_flag < 200)
+			{
+				PORTG = 0xff;
+				_delay_ms(100);
+				PORTG = 0x00;
+				_delay_ms(100);
+				PORTD &= 0x80;
+				if (m_flag==199)
+				{break;}
+				
+			}
+			PORTD |= 0xC0;
+			//PORTD |= 0x80; //dir NonClk, EN - LOW
+			
+			/*for (int i=0;i<200;i++)
+			{
+				PORTA = 0xff;
+				_delay_ms(2);
+				PORTA = 0x00;
+				_delay_ms(2);
+			}*/
+		}
+		else if (recieve == 'd')
+		{
+			USART0_Transmit('D');
+			m_flag = 0;
+			while(m_flag < 200)
+			{
+				PORTD &= 0x0f;
+			}
+
+			PORTD |= 0x40;
+			//PORTD |= 0x00; // EN-LOW, clk-w
+			
+			/*for (int a=0;a<200;a++)
+			{
+				PORTA = 0xff;
+				_delay_ms(2);
+				PORTA = 0x00;
+				_delay_ms(2);
+			}*/
+		}
+		else if (recieve == 's')
+		{
+			USART0_Transmit('S');
+			PORTD |= 0xC0;
+		}
+}
