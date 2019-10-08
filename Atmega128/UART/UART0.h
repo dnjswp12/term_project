@@ -99,3 +99,42 @@ void tx0_string(char *str)
 		i++;
 	}
 }
+
+void UART0_print16bitNumber(uint16_t no)               // 숫자를 문자열로 변환하여 송신, 8비트 int형
+{
+	char numString[6] = "0";
+	int i, index = 0;
+	if(no > 0)// 문자열 변환
+	{
+		for(i=0; no!=0; i++)
+		{
+			numString[i] = no % 10 + '0';
+			no = no / 10;
+		}
+		numString[i] ='\0';
+		index = i-1;
+	}
+	for(i=index; i>=0; i--)
+	{                           // 변환된 문자열 출력
+		USART0_Transmit(numString[i]);
+	}
+}
+void UART0_print32bitNumber(uint32_t no)               // 숫자를 문자열로 변환하여 송신, 8비트 
+{
+	char numString[11] = "0";
+	int i, index = 0;
+	if(no > 0)// 문자열 변환
+	{
+		for(i=0; no!=0; i++)
+		{
+			numString[i] = no % 10 + '0';
+			no = no / 10;
+		} 
+			numString[i] ='\0';
+			index = i-1;
+	} 
+		for(i=index; i>=0; i--)// 변환된 문자열 출력 
+		{
+			USART0_Transmit(numString[i]);
+		}
+}
