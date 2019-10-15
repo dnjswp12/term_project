@@ -58,12 +58,19 @@ int main(void)
 	float a=0;
     while(1)
     {
-	    //PORTG = 0x00;
-	    //test = USART0_Receive();
-	    //USART0_Transmit(test);
-		//USART0_Transmit_NewLine();
-		a = convert_adc();
-		ledbright(a);
+		test = USART0_Receive();
+	    USART0_Transmit(test);
+		USART0_Transmit_NewLine();
+		if (test == 'a')
+		{
+			ADCSRA |= (1<<ADFR);
+			while(1)
+			{
+				a = convert_adc();
+				ledbright(a);
+			}
+		}
+		
 		
 	}
 }
@@ -86,7 +93,7 @@ void LED_init()
 	DDRB |= 0x80; // PB7(OC2)
 	// FOC2 WGM20 COM21 COM20 WGM21 CS22 CS21 CS20
 	//timer2 - PB7
-	//TCCR2 = 0b0 1 11 11011; //f-pwm, n=32, oc clear
+	//TCCR2 = 0b0 1 11 11011; //f-pwm, n=32, oc set
 	TCCR2 |= (0<<FOC2)
 	|(1<<WGM20)|(1<<WGM21)
 	|(0<<COM20)|(1<<COM21)
@@ -112,8 +119,8 @@ float convert_adc(void)
 }
 void ledbright(float Rcc)
 {
-	char str[2];
-	sprintf(str,"adc volt: %4.2f",Rcc);
+	//char str[2];
+	//sprintf(str,"adc volt: %4.2f",Rcc);
 	USART0_Transmit_String("Rc: ");
 	UART0_print32bitNumber(Rcc);
 	USART0_Transmit_NewLine();
@@ -147,3 +154,29 @@ void ledbright(float Rcc)
 		ADCSRA |=(1<<ADSC);
 		_delay_ms(1000);
 }
+
+/*
+float read_light(void)
+{
+	int adc_resol;
+	float vout,rcds,lux;
+	adc_resol=read_adc;
+	vout=(float)((float)adc_resol * 0.0048875855); //OUTPUT VOLTAGE
+	rcds = (23500/vout) - 4700;
+	lux=(float)pow(10,1-(float)(log10(rcds)-log10(40000))/0.8);
+	return lux;
+	if(mode==’3′)
+	{
+		if(pwm<led)
+		PORTA=0×00; // free mode OFF
+		else 
+		PORTA=0xFF; // free mode ON
+		if(++pwm>127)
+		{ pwm=0; delay_us(250); // 변환시간동안 딜레이
+			ADC_I=ADCW; 
+			ADC_F=(float)ADC_I*100.0/1023.0;
+		led=(char)ADC_F;
+		}
+	}
+}
+}*/
