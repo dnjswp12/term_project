@@ -6,21 +6,20 @@
 #include <avr/interrupt.h>
 //#include "/Users/wonjechung/Documents/Atmel Studio/6.2/Final/Final/header/USART1.h"
 
-char m_flag=0;
-char m_flag2=0;
+int m_flag = 0;
+int y; 
+int sum=0;
 ISR(TIMER0_COMP_vect)
 {
-	++m_flag;
-	if (m_flag == 200)
-	{
-		m_flag = 0;
-		m_flag2+=1;
-	}
-	if (m_flag2 == 9)
-	{
-		m_flag2 = 0;
-	}
+	m_flag+=1;
+	
+	//USART1_Transmit_String("timer:");
+	//UART1_print16bitNumber(m_flag);
+	//USART1_Transmit_NewLine();
+	// ocr=124>>interrupt 발생 ctc이므로 int 2번 1개의 펄스 (현재 1ms, 1000hz)
 }
+
+// 모터 1/4 step : 200펄스에 90도임. 0.45*800 = 360;
 void Motor_init()
 {
 	PORTC |= 0x01; // MODE1 1/4step
@@ -31,44 +30,116 @@ void Motor_init()
 	|(1<<COM00)|(0<<COM01)
 	|(0<<CS02)|(1<<CS01)|(1<<CS00);
 	//CTC, N=32, Toggle
-	OCR0 = 125;
+	//OCR0 = 12; //10ms 10khz
+	OCR0 = 124; // 1ms(1000hz) 
 	TIMSK |= (1<<OCIE0);
 	sei(); // output compare match
 }
 
+int average_adc(int avetemp, int r)
+{
+	int result = 0;
+	sum+=avetemp;
+	if (r == 10)
+	{
+		result = sum/10;
+		sum = 0;
+	}
+	return result;
+}
+
 void Motor_up()
 {
-	
-	m_flag = 0;
-	m_flag2 = 0;
-	while(m_flag2<10)
+	_delay_ms(100);
+	m_flag =0;
+	while(m_flag<1600)
 	{
 		PORTD &= 0x80;
-		if (m_flag2==8)
+		USART1_Transmit_String("Motor up:");
+		UART1_print16bitNumber(m_flag);
+		USART1_Transmit_NewLine();
+		if (m_flag>=1600)
 		{
-			m_flag2=0;
-			break;
+			PORTD |=0xC0;
+			++y; 
+			USART1_Transmit_String("Motor up :");
+			UART1_print16bitNumber(m_flag);
+			USART1_Transmit_NewLine();
 		}
 	}
-	PORTD |=0xC0;
 }
+
 void Motor_down()
 {
-	m_flag = 0;
-	m_flag2 = 0;
-	while(m_flag2<10)
+	m_flag =0;
+	
+	while(m_flag<1600)
 	{
 		PORTD &= 0x00;
-		if (m_flag2==8)
+		
+		USART1_Transmit_String("Motor down:");
+		UART1_print16bitNumber(m_flag);
+		USART1_Transmit_NewLine();
+		if (m_flag>=1600)
 		{
-			m_flag2=0;
-			break;
+			PORTD |=0xC0;
+			
+			USART1_Transmit_String("Motor down:");
+			UART1_print16bitNumber(m_flag);
+			USART1_Transmit_NewLine();
 		}
 	}
-	PORTD |=0xC0;
 }
 void Motor_stop()
 {
 	USART1_Transmit('s');//motor stop
 	PORTD = 0xCf;
+}
+void Motor_auto(char m_adc)
+{
+	if (m_adc <= 60)
+	{
+		m_flag = 0;
+		for (; m_flag<=4800;)
+		{
+			PORTD &= 0x80;
+			if (m_flag >= 4800)
+			{
+				y=1;
+				
+				PORTD |=0xC0;
+			}
+			if (y == 1)
+			{
+				y = 0;
+				PORTD |=0xC0;
+				break;
+			}
+		}
+			
+	}
+	
+	else if (m_adc >= 210)
+	{
+		for (m_flag=0; m_flag<=4800;)
+		{
+			PORTD &= 0x00;
+			if (m_flag >= 4800)
+			{
+				y=1;
+				PORTD |=0xC0;
+			}
+			if (y == 1)
+			{
+				y = 0;
+				PORTD |=0xC0;
+				//break;
+			}
+		}
+	 }
+	
+	else
+	{
+		PORTD = 0xCf;
+	}
 }
