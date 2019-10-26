@@ -55,16 +55,16 @@ void Motor_up()
 	while(m_flag<1600)
 	{
 		PORTD &= 0x80;
-		USART1_Transmit_String("Motor up:");
-		UART1_print16bitNumber(m_flag);
-		USART1_Transmit_NewLine();
+		//USART1_Transmit_String("Motor up:");
+		//UART1_print16bitNumber(m_flag);
+		//USART1_Transmit_NewLine();
 		if (m_flag>=1600)
 		{
 			PORTD |=0xC0;
-			++y; 
-			USART1_Transmit_String("Motor up :");
-			UART1_print16bitNumber(m_flag);
-			USART1_Transmit_NewLine();
+			//++y; 
+			//USART1_Transmit_String("Motor up :");
+			//UART1_print16bitNumber(m_flag);
+			//USART1_Transmit_NewLine();
 		}
 	}
 }
@@ -77,16 +77,16 @@ void Motor_down()
 	{
 		PORTD &= 0x00;
 		
-		USART1_Transmit_String("Motor down:");
-		UART1_print16bitNumber(m_flag);
-		USART1_Transmit_NewLine();
+		//USART1_Transmit_String("Motor down:");
+		//UART1_print16bitNumber(m_flag);
+		//USART1_Transmit_NewLine();
 		if (m_flag>=1600)
 		{
 			PORTD |=0xC0;
 			
-			USART1_Transmit_String("Motor down:");
-			UART1_print16bitNumber(m_flag);
-			USART1_Transmit_NewLine();
+			//USART1_Transmit_String("Motor down:");
+			//UART1_print16bitNumber(m_flag);
+			//USART1_Transmit_NewLine();
 		}
 	}
 }
