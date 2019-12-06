@@ -19,7 +19,7 @@ void LED_init()
 	TIMSK |= 0x80;
 	sei();
 }
-char LED_bright(char lf) // 밝은거 어두운거 함수 이름 바꿔야함. 
+char LED_bright(char lf)
 {
 	if (lf <= 10)
 	{
