@@ -46,11 +46,6 @@ char LED_dark(char lf)
 }
 char auto_led(char led_adc)
 {
-	//char str[2];
-	//sprintf(str,"adc volt: %4.2f",Rcc);
-	//USART1_Transmit_String("Rc: ");
-	//UART1_print16bitNumber(led_adc);
-	//USART1_Transmit_NewLine();
 	if (led_adc>= 240)
 	{
 		OCR2 = 0xff;
@@ -59,7 +54,6 @@ char auto_led(char led_adc)
 	{
 		OCR2 = 0x00;
 	}
-	//adcflag = 0;
 	ADCSRA |=(1<<ADSC);
 	_delay_ms(1000);
 	return led_adc;
