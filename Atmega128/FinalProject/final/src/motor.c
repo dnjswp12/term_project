@@ -12,11 +12,6 @@ int sum=0;
 ISR(TIMER0_COMP_vect)
 {
 	m_flag+=1;
-	
-	//USART1_Transmit_String("timer:");
-	//UART1_print16bitNumber(m_flag);
-	//USART1_Transmit_NewLine();
-	// ocr=124>>interrupt 발생 ctc이므로 int 2번 1개의 펄스 (현재 1ms, 1000hz)
 }
 
 // 모터 1/4 step : 200펄스에 90도임. 0.45*800 = 360;
@@ -55,16 +50,9 @@ void Motor_up()
 	while(m_flag<1600)
 	{
 		PORTD &= 0x80;
-		//USART1_Transmit_String("Motor up:");
-		//UART1_print16bitNumber(m_flag);
-		//USART1_Transmit_NewLine();
 		if (m_flag>=1600)
 		{
 			PORTD |=0xC0;
-			//++y; 
-			//USART1_Transmit_String("Motor up :");
-			//UART1_print16bitNumber(m_flag);
-			//USART1_Transmit_NewLine();
 		}
 	}
 }
@@ -76,17 +64,9 @@ void Motor_down()
 	while(m_flag<1600)
 	{
 		PORTD &= 0x00;
-		
-		//USART1_Transmit_String("Motor down:");
-		//UART1_print16bitNumber(m_flag);
-		//USART1_Transmit_NewLine();
 		if (m_flag>=1600)
 		{
 			PORTD |=0xC0;
-			
-			//USART1_Transmit_String("Motor down:");
-			//UART1_print16bitNumber(m_flag);
-			//USART1_Transmit_NewLine();
 		}
 	}
 }
@@ -133,7 +113,6 @@ void Motor_auto(char m_adc)
 			{
 				y = 0;
 				PORTD |=0xC0;
-				//break;
 			}
 		}
 	 }
