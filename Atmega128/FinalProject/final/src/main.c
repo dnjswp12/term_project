@@ -135,12 +135,8 @@ int main()
 					}
 					if (adcflag == 0)
 					{
-						//USART1_Transmit_String("close");
 						break;
 					}
-					//USART1_Transmit_String("main: ");
-					//UART1_print16bitNumber(adctemp);
-					//USART1_Transmit_NewLine();
 				}
 				
 				
