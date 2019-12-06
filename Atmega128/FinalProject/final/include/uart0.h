@@ -34,6 +34,12 @@ void USART0_init(INT16 ubrr)
 	sbi(UCSR0B,RXEN); // RX핀 사용 PE0
 	sbi(UCSR0B,TXEN); // TX핀 사용 PE1
 	
+	
+	//Enable interrupt
+	sbi(UCSR0B,RXCIE); //RX
+	sbi(UCSR0B,TXCIE); //TX
+	//sbi(UCSR0B,UDRIE); //UDR Empty
+	
 	//Set frame format : default값으로 세팅되어 있음
 	/*
 	cbi(UCSR0C,UMSEL); // 0: 비동기 1: 동기
@@ -44,11 +50,6 @@ void USART0_init(INT16 ubrr)
 	sbi(UCSR0C,UCSZ01);
 	sbi(UCSR0C,UCSZ00);
 	*/
-	
-	//Enable interrupt
-	sbi(UCSR0B,RXCIE); //RX
-	//sbi(UCSR0B,TXCIE); //TX
-	//sbi(UCSR0B,UDRIE); //UDR Empty
 }
 
 
