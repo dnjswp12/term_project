@@ -207,7 +207,7 @@ int uartflag(char mooode)
 	}
 	else
 	{
-		//;U_flag = 0;
+		U_flag = 0;
 	}
 	
 	 return U_flag;
